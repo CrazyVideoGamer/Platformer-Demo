@@ -10,7 +10,6 @@ let dirt_color;
 
 // Entities
 let player;
-let gravity;
 let floor;
 let walls = [];
 
@@ -61,9 +60,6 @@ function setup() {
 			right: [catWalkRight1, catWalkRight2, catWalkRight3, catWalkRight4]
 		}
 	}, [width, height]);
-
-	gravity = createVector(0, -1 * 1 * player.mass);
-	player.setGravity(gravity);
 
 	floor = new Wall(0, height - 50, width, 50, floor_color);
 	for (wall of walls) {

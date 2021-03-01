@@ -8,14 +8,14 @@ class Player {
 		this.keyframe_index = 0;
 		this.keyframe_num = imgs.walk.left.length
 		this.switch_costume = false;
-		this.animation_speed = 0.1;
+		this.animation_speed = 0.5;
 		// this is used so we can stop when he is not moving
 		this.moving = false;
 
 		this.imgs = imgs;
 		this.direction = 'right';
 		this.mass = 2;
-		this.gravity; // Set variable during setup() in sketch.js
+		this.gravity = createVector(0, -1 * this.mass);
 		this.vel = createVector(); 
 		
 		// jump var
@@ -49,9 +49,26 @@ class Player {
 
 	}
 	display() {
+		// Draw the cat (w/ animation between multiple images)
+		this.animate();
+
+		let rounded_keyframe_index = this.keyframe_index
+		if (!this.walk) {
+			rounded_keyframe_index = Math.floor(this.keyframe_index) % (this.keyframe_num - 1)
+		}
+
+		if (this.direction === 'right') {
+			let img = this.imgs.walk.right[rounded_keyframe_index]
+			image(img, this.pos.x, this.pos.y, this.catWidth, this.catHeight);
+		}
+		if (this.direction === 'left') {
+			let img = this.imgs.walk.left[rounded_keyframe_index];
+			image(img, this.pos.x, this.pos.y, this.catWidth, this.catHeight);
+		}
+
 		let newVel = p5.Vector.add(this.vel, this.gravity);
 
-		let newPos = createVector(this.pos.y + -1 * newVel.y, this.pos.x + newVel.x);
+		let newPos = createVector(this.pos.x + newVel.x, this.pos.y + newVel.y);
 		let newBoundingBox = {
 			tL: newPos,
 			// tR: [this.pos.x + 25 + 126, this.pos.y + 6],
@@ -67,30 +84,12 @@ class Player {
 			this.pos.x = newPos.x;
 			this.vel = newVel;
 			// Update boundingBox
+			this.boundingBox = newBoundingBox
 		}
-		this.boundingBox = newBoundingBox
 
 		this.pos.y = constrain(this.pos.y, 0, this.floorY);
 
 		this.pos.x = constrain(this.pos.x, 0, this.width - this.catWidth);
-
-		// Draw the cat (w/ animation between multiple images)
-		// this.animate();
-
-		let rounded_keyframe_index = this.keyframe_index
-		if (!this.walk) {
-			rounded_keyframe_index = Math.floor(this.keyframe_index) % (this.keyframe_num - 1)
-		}
-
-		if (this.direction === 'right') {
-			let img = this.imgs.walk.right[rounded_keyframe_index]
-			image(img, this.pos.x, this.pos.y, this.catWidth, this.catHeight);
-			
-		}
-		if (this.direction === 'left') {
-			let img = this.imgs.walk.left[rounded_keyframe_index];
-			image(img, this.pos.x, this.pos.y, this.catWidth, this.catHeight);
-		}
 	}
 	move(x, y) {
 		this.pos.x += x;
@@ -129,9 +128,10 @@ class Player {
 			// implement not moving logic
 			this.moving = false;
 		}
+		this.display();
 	}
 	animate() {
-		this.keyframe_index += this.animation_speed
+		this.keyframe_index += this.animation_speed / 10
 	}
 	camera() {
 		let offset = 0;
@@ -142,13 +142,18 @@ class Player {
 		}
 	}
 	checkWallIntersectionBeforePosChange(newBoundingBox) {
+		//console.log = (data) => document.body.appendChild(document.createTextNode(data));
+		//console.log("CHECK_WALL_INTERSECTION_BEFORE_POS_CHANGE");
+		console.log("newpass---")
 		for (wall of Wall.walls) {
-			if (wall.collision(newBoundingBox).x === "intersecting") {
+			//console.log(wall)
+			//if (wall.collision(newBoundingBox).x === "intersecting") { //You were using the colision function wrong!
+			console.log(wall.collision(newBoundingBox).x);
+			if (wall.collision(newBoundingBox).x !== "") {
 				return true;
 			}
 		}
-		// WHY DOES IT ALWAYS ONLY SAY EPIC WHEN CAT REACHES THE END WHAT???
-		// console.log('epic')
+		
 		return false;
 	}
 }

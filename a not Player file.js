@@ -15,7 +15,7 @@ class Player {
 		this.imgs = imgs;
 		this.direction = 'right';
 		this.mass = 2;
-		this.gravity; // Set variable during setup() in sketch.js
+		this.gravity = createVector(0, -1 * this.mass);
 		this.vel = createVector(); 
 		
 		// jump var
@@ -47,7 +47,7 @@ class Player {
 	display() {
 		let newVel = p5.Vector.add(this.vel, this.gravity);
 		let newPos = createVector(
-			limit(this.pos.x + newVel.x, 0, this.gameWidth - this.catWidth), 
+			limit(this.pos.x + newVel.x, [0, this.gameWidth - this.catWidth]), 
 			limit(this.pos.y - newVel.y, [this.floorY], "min")
 		)
 		let newBoundingBox = {
@@ -60,7 +60,7 @@ class Player {
 		this.boundingBox = newBoundingBox;
 
 		// Draw the cat (w/ animation between multiple images)
-		// this.animate();
+		this.animate();
 
 		let rounded_keyframe_index = this.keyframe_index
 		if (!this.walk) {
