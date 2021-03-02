@@ -1,9 +1,10 @@
-# Platformer
+# Cat Platformer
 Extremely epic game cat game
 
 
-Contribute
+# Contribute
+
 Give suggestions to solve the problems we have!
 
-Created by
+# Created by
 ABadGamer73 and CrazyVideoGamez
