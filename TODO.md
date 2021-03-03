@@ -15,4 +15,4 @@ None
 * collision
 # DONE
 * animation
-* walls
+* walls(but no collision)
