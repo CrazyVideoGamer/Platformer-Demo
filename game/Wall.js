@@ -10,9 +10,7 @@ class Wall {
 		// Same format as in Player.js
 		this.boundingBox = {
 			tL: createVector(this.x, this.y),
-			// tR: createVector(this.x + this.width, this.y),
-			// bL: createVector(this.x, this.y + 50),
-			bR: createVector(this.x + this.width, this.y + 50)
+			bR: createVector(this.x + this.width, this.y + this.height)
 		}
 		// console.log(this.boundingBox)
 		

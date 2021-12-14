@@ -34,7 +34,6 @@ function preload() {
 	catWalkLeft2 = loadImage('../assets/cat/walk/walk left 1.svg')
 	catWalkLeft3 = loadImage('../assets/cat/walk/walk left 2.svg')
 	catWalkLeft4 = loadImage('../assets/cat/walk/walk left 3.svg')
-
 	// catJump = loadImage('../assets/cat/jump/right jump.svg')
 }
 
@@ -51,7 +50,7 @@ function setup() {
 	dirt_color = color(143, 109, 77)
 	// Entities
 	walls.push([
-		width-150, height - 70 -50, 40, 70, dirt_color
+		width-150, height - 70 - 50, 40, 70, dirt_color
 	])
 
 	player = new Player({
@@ -87,6 +86,7 @@ function game() {
 	stroke('purple');
 	strokeWeight(20);
 	point(player.boundingBox.tL)
+  stroke('blue');
 	point(player.boundingBox.bR)
 	pop()
 
