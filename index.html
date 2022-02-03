@@ -5,27 +5,27 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>The Meow Ninja - Demo</title>
-
-  <script src="./libraries/p5.min.js">
-    console.log("uwu");
-	</script>
+  <script src="./libraries/p5.min.js"></script>
 	<script src="./libraries/p5.sound.min.js">
 	</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.js" integrity="sha512-kTA5As3DFbe7Gz6vIpsyaWjX9WSEKeyGigJkmzlQDIUVlPV5ceFxKHG+CAXvbxQvd8iVWJ6nS5egDw1WCss4Sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script src="./libraries/Transformer.js">
 	</script> <!-- Use so I can get the origin after transformations -->
-	<script src="./game/Player.js">
+
+  <script src="./game/Player.js">
 	</script>
-	<script src="./game/Wall.js">
+	<script src="./game/Platform.js">
 	</script>
 	<script src="./game/helpers.js">
 	</script>
 </head>
 
 <body>
-	<h1>The Meow Ninja</h1>
+	<h1>Cat</h1>
   
 	<p id="status">Progress:</p>
 	<main id="game"></main>
+  <canvas id="canvas"></canvas>
 
   <script src="./game/sketch.js"></script>
 </body>

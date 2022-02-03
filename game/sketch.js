@@ -1,69 +1,131 @@
 /* Initialize all variables */
 // Canvas
-let height = 400;
-let width = 800;
+let gameHeight = 400;
+let gameWidth = 800;
 let stage = 0; // Game stage
 
 // colors
-let floor_color;
-let dirt_color;
+let colors = { floor: null, dirt: null };
 
 // Entities
 let player;
 let floor;
-let walls = [];
+let platforms = [];
+let platformBodies = [];
 
 // Cat Animation Pictures
-let catWalkRigh1;
-let catWalkRight2;
-let catWalkRight3;
-let catWalkRight4;
+let imgs = {
+  left: {
+    walk: [],
+    jump: {
+      up: [],
+      down: []
+    }
+  },
+  right: {
+    walk: [],
+    jump: {
+      up: [],
+      down: []
+    }
+  }
+}
 
-let catWalkLeft1;
-let catWalkLeft2;
-let catWalkLeft3;
-let catWalkLeft4;
+/*
+* Load multiple images with specfic size
+*
+* imagePaths: string[] = paths of the images
+* size: int[2] || undefined = Numbers to change the size of all images provided. If wanting to preserve aspect ratio while changing one dimension, set the other to 0.
+*
+* Returns: p5.Image[] = Array containing images.
+*/
+function loadImages(imagePaths, size, prefix='') {
+  let imgs = []
+  for (let path of imagePaths) {
+    imgs.push(loadImage(prefix + path, (img) => {
+      if (size) {
+        img.resize(...size)
+      }
+    }))
+  }
+
+  return imgs;
+}
+
+/* matter.js */
+let Engine = Matter.Engine,
+    Runner = Matter.Runner;
+
+let engine;
 
 function preload() {
-	catWalkRight1 = loadImage('../assets/cat/walk/walk right 0.png')
-	catWalkRight2 = loadImage('../assets/cat/walk/walk right 1.svg')
-	catWalkRight3 = loadImage('../assets/cat/walk/walk right 2.svg')
-	catWalkRight4 = loadImage('../assets/cat/walk/walk right 3.svg')
+  imgs.left.walk = loadImages([
+    'walk left 0.png',
+    'walk left 1.svg',
+    'walk left 2.svg',
+    'walk left 3.svg'
+  ], [150, 100], '../assets/cat/walk/');
+  
+	imgs.right.walk = loadImages([
+    'walk right 0.png',
+    'walk right 1.svg',
+    'walk right 2.svg',
+    'walk right 3.svg'
+  ], [150, 100], '../assets/cat/walk/');
 
-	catWalkLeft1 = loadImage('../assets/cat/walk/walk left 0.png')
-	catWalkLeft2 = loadImage('../assets/cat/walk/walk left 1.svg')
-	catWalkLeft3 = loadImage('../assets/cat/walk/walk left 2.svg')
-	catWalkLeft4 = loadImage('../assets/cat/walk/walk left 3.svg')
-	// catJump = loadImage('../assets/cat/jump/right jump.svg')
+  imgs.left.jump = {
+    up: [ loadImage('../assets/cat/jump/left jump.svg') ],
+    down: [ loadImage('../assets/cat/jump/left fall.svg') ]
+  }
+  imgs.right.jump = {
+    up: [ loadImage('../assets/cat/jump/right jump.svg') ],
+    down: [ loadImage('../assets/cat/jump/right fall.svg') ]
+  }
 }
 
 function setup() {
-	let myCanvas = createCanvas(width, height);
-	myCanvas.parent('game') // Moves the game into the #game div
-	console.log("yay")
+	let myCanvas = createCanvas(gameWidth, gameHeight);
+	myCanvas.parent('game')
+
+  let canvas = document.getElementById("canvas");
+  engine = Engine.create();
+  let render = Matter.Render.create({
+    canvas,
+    engine,
+    wireframes: false,
+    width: gameWidth,
+    height: gameHeight
+  })
+  Matter.Render.run(render);
 
 	let status = document.getElementById('status');
 	status.style.display = "none" // Hides the progress text (this is run when the game pops up)
 
 	// Colors
-	floor_color = color(70, 70, 70)
-	dirt_color = color(143, 109, 77)
+  colors.floor = color(70, 70, 70);
+	colors.dirt = color(143, 109, 77);
+  
 	// Entities
-	walls.push([
-		width-150, height - 70 - 50, 40, 70, dirt_color
-	])
 
-	player = new Player({
-		walk: {
-			left: [catWalkLeft1, catWalkLeft2, catWalkLeft3, catWalkLeft4],
-			right: [catWalkRight1, catWalkRight2, catWalkRight3, catWalkRight4]
-		}
-	}, [width, height]);
-
-	floor = new Wall(0, height - 50, width, 50, floor_color);
-	for (wall of walls) {
-		new Wall(...wall)
+  let platformArgs = [];
+  
+	platformArgs.push(...[
+    [gameWidth-150, gameHeight - 70 - 50, 40, 70, colors.dirt],
+    [0, gameHeight - 50, gameWidth, 50, colors.floor],
+  ]);
+  
+  for (args of platformArgs) {
+    let platform = new Platform(...args, engine)
+		platforms.push(platform);
+    platformBodies.push(platform.body)
 	}
+  
+	player = new Player(imgs, platformBodies, [gameWidth, gameHeight], engine);
+
+  let runner = Runner.create();
+  Runner.run(runner, engine);
+
+  // Matter.Render.create();
 }
 
 function draw() {
@@ -81,28 +143,11 @@ function game() {
 	background(220, 220, 220);
 
 	player.camera();
-	
-	push()
-	stroke('purple');
-	strokeWeight(20);
-	point(player.boundingBox.tL)
-  stroke('blue');
-	point(player.boundingBox.bR)
-	pop()
 
+  player.processInput();
 	player.display();
-	player.processInput();
 	
-	for (wall of Wall.walls) {
-		wall.display();
-		// console.log(wall.collision(player.boundingBox))
+	for (platform of platforms) {
+		platform.display();
 	}
-}
-
-// Check how long you mash the up key, and jump accordingly
-
-let time = 0;
-
-function keyPress() {
-	
 }

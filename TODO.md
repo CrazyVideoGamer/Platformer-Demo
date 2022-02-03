@@ -6,9 +6,10 @@ None
 * Catnip reward (:O) just the collectables for 100% run
 * Portal
 * Lives
+* Death screen and death barriers(just a simple one)
 # power up ideas
 * shield just a basic shield
-* shield but if you press q you shoot a crescent moon shaped projectile if you hit w same thing but it sends you in a direction opposite of the direction the mouse is and sends far
+* shield but if you press q you shoot a crescent moon shaped projectile if you hit w same thing but it sends you in a direction opposite of the direction the mouse is and sends far(shield dissapears)
 * katana is a long ranged meele attack high in damage but its not as spammable as the default claws
 # DOING
 ## FIX
