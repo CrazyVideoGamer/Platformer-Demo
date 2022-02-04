@@ -170,7 +170,7 @@ class Player {
         this.jump();
       }
 
-      let posDelta = 12;
+      let posDelta = 6;
       let targetX = this.body.position.x;
       console.log(targetX);
       
