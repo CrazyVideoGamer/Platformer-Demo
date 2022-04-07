@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,9 +9,13 @@
 	<script src="./libraries/p5.sound.min.js">
 	</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.js" integrity="sha512-kTA5As3DFbe7Gz6vIpsyaWjX9WSEKeyGigJkmzlQDIUVlPV5ceFxKHG+CAXvbxQvd8iVWJ6nS5egDw1WCss4Sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script src="./libraries/Transformer.js">
+	<script src="./libraries/matrix.js">
 	</script> <!-- Use so I can get the origin after transformations -->
 
+  <script>
+    'use strict';
+  </script>
+  
   <script src="./game/Player.js">
 	</script>
 	<script src="./game/Platform.js">
@@ -21,11 +25,9 @@
 </head>
 
 <body>
-	<h1>Cat</h1>
-  
+	<h1>The Cat That Can Jump</h1>
 	<p id="status">Progress:</p>
-	<main id="game"></main>
-  <canvas id="canvas"></canvas>
+	<main id="game" style="position: relative;"></main>
 
   <script src="./game/sketch.js"></script>
 </body>
