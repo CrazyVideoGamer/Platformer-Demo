@@ -1,5 +1,7 @@
 class Player {
-  constructor(imgs, platformBodies, gameDimmensions, camScale, engine) {
+  constructor(s, imgs, platformBodies, gameDimmensions, camScale, engine) {
+    this.s = s;
+    
     // this.keyframe_index = 0;
     // this.animation_length = imgs.left.walk.length // will be the same length for left and right walking animations.
     // this.animation_speed = 0.1;
@@ -61,36 +63,36 @@ class Player {
     y -= this.catHeight / 2
     
     push()
-    translate(this.body.position.x, this.body.position.y) // make the center of the cat the origin so scaling applies here
+    this.s.translate(this.body.position.x, this.body.position.y) // make the center of the cat the origin so scaling applies here
     !this.direction ? scale(-1, 1) : null;
-    translate(-this.catWidth / 2, -this.catHeight / 2)
+    this.s.translate(-this.catWidth / 2, -this.catHeight / 2)
 
     // Base
     image(this.imgs.base, 0, 0);
 
     // Legs
     let legHeight = this.imgs.base.height - this.legSink;
-    image(this.imgs.leg, 
+    this.s.image(this.imgs.leg, 
           10, 
           this.imgs.base.height - this.legSink
     );
-    image(this.imgs.leg, 
+    this.s.image(this.imgs.leg, 
           10 + this.imgs.leg.width + 5, 
           this.imgs.base.height - this.legSink
     );
     
     let secondFrontLegBegin = this.catWidth - 10 - this.imgs.leg.width;
-    image(this.imgs.leg, 
+    this.s.image(this.imgs.leg, 
           secondFrontLegBegin, 
           this.imgs.base.height - this.legSink
     );
-    image(this.imgs.leg, 
+    this.s.image(this.imgs.leg, 
           secondFrontLegBegin - this.imgs.leg.width - 5,
           this.imgs.base.height - this.legSink
     );
 
     // Tail
-    image(
+    this.s.image(
       this.imgs.tail,
       -this.imgs.tail.width,
       this.catHeight / 2 - this.imgs.tail.height / 2 + 3,
@@ -249,15 +251,14 @@ class Player {
   }
   
   camera() {
-    scale(this.camScale);
     let x = this.body.position.x;
     let offset = createVector(0, 0);
     let cameraOffset = createVector(this.gameWidth / 2 - x - this.catWidth / 2 + offset.x, offset.y);
-    translate(cameraOffset);
+    this.s.translate(cameraOffset);
+    this.s.scale(this.camScale);
   }
 
   appendPlatformBody(body) {
-    console.log("owo")
     this.platformBodies.push(body)
   }
 
@@ -269,3 +270,5 @@ class Player {
     this.platformBodies.splice(index, 1);
   }
 }
+
+export default Player;

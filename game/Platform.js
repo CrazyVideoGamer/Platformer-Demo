@@ -1,5 +1,7 @@
 class Platform {
-	constructor(x, y, width, height, fillColor, engine) {
+	constructor(s, x, y, width, height, fillColor, engine) {
+    this.s = s;
+    
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -20,9 +22,11 @@ class Platform {
   }
 	update() {
 		push();
-		fill(this.fillColor);
-    rectMode(CORNERS)
-		rect(this.x, this.y, this.x + this.width, this.y + this.height);
+		this.s.fill(this.fillColor);
+    this.s.rectMode(CORNERS)
+		this.s.rect(this.x, this.y, this.x + this.width, this.y + this.height);
 		pop();
 	}
 }
+
+export default Platform;

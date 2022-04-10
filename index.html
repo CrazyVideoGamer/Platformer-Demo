@@ -9,19 +9,17 @@
 	<script src="./libraries/p5.sound.min.js">
 	</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.js" integrity="sha512-kTA5As3DFbe7Gz6vIpsyaWjX9WSEKeyGigJkmzlQDIUVlPV5ceFxKHG+CAXvbxQvd8iVWJ6nS5egDw1WCss4Sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script src="./libraries/matrix.js">
+	<script src="./libraries/matrix.js" type="module">
 	</script> <!-- Use so I can get the origin after transformations -->
 
   <script>
     'use strict';
   </script>
   
-  <script src="./game/Player.js">
+<!--   <script src="./game/Player.js" type="module">
 	</script>
-	<script src="./game/Platform.js">
-	</script>
-	<script src="./game/helpers.js">
-	</script>
+	<script src="./game/Platform.js" type="module">
+	</script> -->
 </head>
 
 <body>
@@ -29,6 +27,6 @@
 	<p id="status">Progress:</p>
 	<main id="game" style="position: relative;"></main>
 
-  <script src="./game/sketch.js"></script>
+  <script src="./game/sketch.js" type="module"></script>
 </body>
 </html

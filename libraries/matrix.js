@@ -431,3 +431,5 @@ Matrix.prototype = {
 			this.context.setTransform(this.a, this.b, this.c, this.d, this.e, this.f);
 	}
 };
+
+export default Matrix;
