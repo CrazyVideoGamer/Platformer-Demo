@@ -1,108 +1,210 @@
-/* Initialize all variables */
-// Canvas
-let height = 400;
-let width = 800;
-let stage = 0; // Game stage
+'use strict';
 
-// colors
-let floor_color;
-let dirt_color;
+import Player from './Player.js'
+import Platform from './Platform.js'
+import * as Helpers from './helpers.js'
+import Matrix from '/libraries/matrix.js'
 
-// Entities
-let player;
-let floor;
-let walls = [];
+let myp5 = new p5(s => {
+  /* Initialize all variables */
+  // Canvas
+  let gameHeight = 400;
+  let gameWidth = 800;
+  let camScale = 0.8;
+  let stage = 1; // Game stage
+  
+  // Colors
+  let colors = {
+    floor: null,
+    dirt: null,
+  };
+  
+  let matrix; // store all transformations
+  
+  // Entities
+  let player;
+  let floor;
+  let platforms = [];
+  let platformBodies = [];
+  
+  let platformProxy = new Proxy(platforms, {
+    set(target, property, value, receiver) {
+      target[property] = value;
+      if (property != "length") {
+        if (!player) {
+          platformBodies.push(value.body)
+        } else {
+          player.appendPlatformBody(value.body)
+        }
+      }
+      return true;
+    },
+    deleteProperty(target, property) {
+      let index = parseInt(property)
+      platformBodies.splice(index, 1);
+      player.deletePlatformBodyByIndex(index);
+      delete target[property]
+      return true;
+    }
+  });
+  
+  // Cat Animation Pictures
+  let imgs = {
+    base: null,
+    tail: null,
+    leg: null
+  }
+  
+  /* matter.js */
+  let Engine = Matter.Engine,
+      Runner = Matter.Runner;
+  let engine;
+  let runner;
+  
+  s.preload = () => {
+    [imgs.base, imgs.leg, imgs.tail] = Helpers.loadImages(s, s[
+      'base.svg',
+      'leg.svg',
+      'tail.svg', [55, null]
+    ], '../assets/cat/');
+  }
+  
+  s.setup = () => {
+  	let myCanvas = createCanvas(gameWidth, gameHeight);
+  	myCanvas.parent('game')
+    let gameEl = myCanvas.elt;
+  
+    let canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    engine = Engine.create({
+      gravity: { x:0, y:2 } // double the gravity
+    });
+    let render = Matter.Render.create({
+      canvas,
+      engine,
+      wireframes: false,
+      width: gameWidth,
+      height: gameHeight
+    })
+    Matter.Render.run(render);
+  
+  	let status = document.getElementById('status');
+  	status.style.display = "none" // Hides the progress text (this is run when the game pops up)
+  
+    // Colors
+  
+    colors.floor = color(70, 70, 70);
+    colors.dirt = color(143, 109, 77);
+    
+  	// Entities
+  
+    let platformArgs = [];
+    
+  	platformArgs.push(...[
+      [gameWidth - 150, gameHeight - 69 - 80, 100, 100, colors.dirt], // (x coord, y coord, width, height, color)
+      [0, gameHeight - 50, gameWidth, 50, colors.floor],
+    ]);
+    
+    for (args of platformArgs) {
+      let platform = new Platform(s, ...args, engine)
+  		platformProxy.push(platform);
+  	}
+    
+  	player = new Player(s, imgs, platformBodies, [gameWidth, gameHeight], camScale, engine);
+  
+    runner = Runner.create();
+    Runner.run(runner, engine);
+  
+    /// Debug
+    debugCheckbox()
+    
+  }
+  
+  s.draw = () => {
+  	if (stage === 0) {
+  	  
+      // menu
+  	}
+  	if (stage === 1) {
+  		game();
+  	}
+  }
+  
+  
+  // Game function
+  function game() {
+  	s.background(220, 220, 220);
+  
+  	player.camera();
+  
+  	for (platform of platforms) {
+  		platform.update();
+  	}
+  
+    player.processInput();
+  	player.update();
+  
+    matrix = new Matrix(drawingContext);
+  }
 
-// Cat Animation Pictures
-let catWalkRigh1;
-let catWalkRight2;
-let catWalkRight3;
-let catWalkRight4;
-
-let catWalkLeft1;
-let catWalkLeft2;
-let catWalkLeft3;
-let catWalkLeft4;
-
-function preload() {
-	catWalkRight1 = loadImage('../assets/cat/walk/walk right 0.png')
-	catWalkRight2 = loadImage('../assets/cat/walk/walk right 1.svg')
-	catWalkRight3 = loadImage('../assets/cat/walk/walk right 2.svg')
-	catWalkRight4 = loadImage('../assets/cat/walk/walk right 3.svg')
-
-	catWalkLeft1 = loadImage('../assets/cat/walk/walk left 0.png')
-	catWalkLeft2 = loadImage('../assets/cat/walk/walk left 1.svg')
-	catWalkLeft3 = loadImage('../assets/cat/walk/walk left 2.svg')
-	catWalkLeft4 = loadImage('../assets/cat/walk/walk left 3.svg')
-	// catJump = loadImage('../assets/cat/jump/right jump.svg')
-}
-
-function setup() {
-	let myCanvas = createCanvas(width, height);
-	myCanvas.parent('game') // Moves the game into the #game div
-	console.log("yay")
-
-	let status = document.getElementById('status');
-	status.style.display = "none" // Hides the progress text (this is run when the game pops up)
-
-	// Colors
-	floor_color = color(70, 70, 70)
-	dirt_color = color(143, 109, 77)
-	// Entities
-	walls.push([
-		width-150, height - 70 - 50, 40, 70, dirt_color
-	])
-
-	player = new Player({
-		walk: {
-			left: [catWalkLeft1, catWalkLeft2, catWalkLeft3, catWalkLeft4],
-			right: [catWalkRight1, catWalkRight2, catWalkRight3, catWalkRight4]
-		}
-	}, [width, height]);
-
-	floor = new Wall(0, height - 50, width, 50, floor_color);
-	for (wall of walls) {
-		new Wall(...wall)
-	}
-}
-
-function draw() {
-	if (stage === 0) {
-		game();
-	}
-	if (stage === 1) {
-		// pass
-		// pause menu
-	}
-}
-
-// Game function
-function game() {
-	background(220, 220, 220);
-
-	player.camera();
-	
-	push()
-	stroke('purple');
-	strokeWeight(20);
-	point(player.boundingBox.tL)
-  stroke('blue');
-	point(player.boundingBox.bR)
-	pop()
-
-	player.display();
-	player.processInput();
-	
-	for (wall of Wall.walls) {
-		wall.display();
-		// console.log(wall.collision(player.boundingBox))
-	}
-}
-
-// Check how long you mash the up key, and jump accordingly
-
-let time = 0;
-
-function keyPress() {
-	
-}
+  function invertTransformOnPoint(x, y) {
+    return matrix.getInverse().scale(2, 2).applyToPoint(x, y) // idk why scale(2, 2) :(
+  }
+  
+  // Add platforms with ease
+  let x, y;
+  let pWidth = 0;
+  let pHeight = 0;
+  let curIndex;
+  let creatingPlatform = false;
+  let debug = false;
+  function debugCheckbox() {
+    let _debugCheckbox = createCheckbox('debug', false);
+    _debugCheckbox.changed(() => {
+      debug = _debugCheckbox.checked();
+    })
+    _debugCheckbox.parent('game');
+    _debugCheckbox.position(0, 0);
+  }
+  
+    
+  function mousePressed() {
+    if (debug) {
+      creatingPlatform = true;
+      pWidth = pHeight = 0;
+      let mouseCoords = invertTransformOnPoint(mouseX, mouseY)
+      x = mouseCoords.x
+      y = mouseCoords.y
+      platformProxy.push(new Platform(
+        x, y, 
+        pWidth, pHeight,
+        color(255, 255, 255),
+        engine
+      ));
+      curIndex = platforms.length - 1;
+    }
+  }
+  
+  function mouseDragged() {
+    if (creatingPlatform) {
+      let mouseCoords = invertTransformOnPoint(mouseX, mouseY)
+      pWidth = mouseCoords.x - x;
+      pHeight = mouseCoords.y - y;
+      platforms[curIndex].width = pWidth;
+      platforms[curIndex].height = pHeight;
+      platforms[curIndex].updateBody(player);
+    }
+  }
+    
+  function mouseReleased() {
+    if (debug) {
+      creatingPlatform = false;
+      if (platforms[curIndex].width == 0 || platforms[curIndex].height == 0) {
+        platformProxy.splice(curIndex, 1); // remove platform if it isn't visible
+      }
+      pWidth = pHeight = 0;
+      x = y = null;
+    }
+  }
+  
+})
