@@ -5,24 +5,22 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>The Meow Ninja - Demo</title>
-  <script src="./libraries/p5.min.js"></script>
-	<script src="./libraries/p5.sound.min.js">
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.min.js"></script>
+  <!-- <script src="./libraries/p5.min.js"></script> -->
+	<!-- <script src="./libraries/p5.sound.min.js"> -->
 	</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.js" integrity="sha512-kTA5As3DFbe7Gz6vIpsyaWjX9WSEKeyGigJkmzlQDIUVlPV5ceFxKHG+CAXvbxQvd8iVWJ6nS5egDw1WCss4Sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.js" integrity="sha512-kTA5As3DFbe7Gz6vIpsyaWjX9WSEKeyGigJkmzlQDIUVlPV5ceFxKHG+CAXvbxQvd8iVWJ6nS5egDw1WCss4Sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script src="./libraries/matrix.js" type="module">
 	</script> <!-- Use so I can get the origin after transformations -->
-
-  <script>
-    'use strict';
-  </script>
   
-<!--   <script src="./game/Player.js" type="module">
+  <script src="./game/Player.js" type="module">
 	</script>
 	<script src="./game/Platform.js" type="module">
-	</script> -->
+	</script>
 </head>
 
 <body>
+	<script>console.log(p5)</script>
 	<h1>The Cat That Can Jump</h1>
 	<p id="status">Progress:</p>
 	<main id="game" style="position: relative;"></main>

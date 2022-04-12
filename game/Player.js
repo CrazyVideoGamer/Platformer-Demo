@@ -1,274 +1,299 @@
+import Matter from "/libraries/matter.min.js";
+
 class Player {
-  constructor(s, imgs, platformBodies, gameDimmensions, camScale, engine) {
-    this.s = s;
-    
-    // this.keyframe_index = 0;
-    // this.animation_length = imgs.left.walk.length // will be the same length for left and right walking animations.
-    // this.animation_speed = 0.1;
+	constructor(s, imgs, platformBodies, gameDimmensions, camScale, engine) {
+		this.s = s;
 
-    this.imgs = imgs;
+		// this.keyframe_index = 0;
+		// this.animation_length = imgs.left.walk.length // will be the same length for left and right walking animations.
+		// this.animation_speed = 0.1;
 
-    this.platformBodies = platformBodies;
-    this.isGrounded = false;
-    
-    // Cat dimensions
-    this.legSink = 10;
-    this.catWidth = this.imgs.base.width;
-    this.catHeight = this.imgs.base.height + this.imgs.leg.height - this.legSink;
+		this.imgs = imgs;
 
-    this.camScale = camScale;
-    this.gameWidth = gameDimmensions[0] * this.camScale;
-    this.gameHeight = gameDimmensions[1] * this.camScale;
+		this.platformBodies = platformBodies;
+		this.isGrounded = false;
 
+		// Cat dimensions
+		this.legSink = 10;
+		this.catWidth = this.imgs.base.width;
+		this.catHeight =
+			this.imgs.base.height + this.imgs.leg.height - this.legSink;
 
-    this.floorY = this.gameHeight - 50 - this.catHeight - this.imgs.leg.height;
+		this.camScale = camScale;
+		this.gameWidth = gameDimmensions[0] * this.camScale;
+		this.gameHeight = gameDimmensions[1] * this.camScale;
 
-    this.body = null;
-    this.reset();
-    
-  }
+		this.floorY = this.gameHeight - 50 - this.catHeight - this.imgs.leg.height;
 
-  reset() {
-    if (this.body) {
-      Matter.Composite.remove(engine.world, this.body)
-    }
-    let x = 20;
-    let y = this.floorY - 100; // cat starts off floating and then falls
+		this.body = null;
+		this.engine = engine;
+		this.reset();
+	}
 
-    this.isGrounded = false;
-    this.ceilingExists = false;
+	reset() {
+		if (this.body) {
+			Matter.Composite.remove(this.engine.world, this.body);
+		}
+		let x = 20;
+		let y = this.floorY - 100; // cat starts off floating and then falls
 
-    this.direction = 1; // Used to hold right or left. right = true, left = false.
-    this.moving = false; // is moving. Doesn't count sliding
+		this.isGrounded = false;
+		this.ceilingExists = false;
 
-    this.friction = .1; // default = .1
-    this.mass = 40;
-    this.body = Matter.Bodies.rectangle(x + this.catWidth / 2, y + this.catHeight / 2, this.catWidth, this.catHeight, {
-      mass: this.mass,
-      friction: this.friction,
-      inertia: Infinity,
-    });
-    
-    Matter.Composite.add(engine.world, this.body);
-  }
+		this.direction = 1; // Used to hold right or left. right = true, left = false.
+		this.moving = false; // is moving. Doesn't count sliding
 
-  update() {
-    this.physics();
-    this.draw();
-  }
+		this.friction = 0.1; // default = .1
+		this.mass = 40;
+		this.body = Matter.Bodies.rectangle(
+			x + this.catWidth / 2,
+			y + this.catHeight / 2,
+			this.catWidth,
+			this.catHeight,
+			{
+				mass: this.mass,
+				friction: this.friction,
+				inertia: Infinity
+			}
+		);
 
-  draw() {
-    let {x, y} = this.body.position;
-    x -= this.catWidth / 2
-    y -= this.catHeight / 2
-    
-    push()
-    this.s.translate(this.body.position.x, this.body.position.y) // make the center of the cat the origin so scaling applies here
-    !this.direction ? scale(-1, 1) : null;
-    this.s.translate(-this.catWidth / 2, -this.catHeight / 2)
+		Matter.Composite.add(this.engine.world, this.body);
+	}
 
-    // Base
-    image(this.imgs.base, 0, 0);
+	update() {
+		this.physics();
+		this.draw();
+	}
 
-    // Legs
-    let legHeight = this.imgs.base.height - this.legSink;
-    this.s.image(this.imgs.leg, 
-          10, 
-          this.imgs.base.height - this.legSink
-    );
-    this.s.image(this.imgs.leg, 
-          10 + this.imgs.leg.width + 5, 
-          this.imgs.base.height - this.legSink
-    );
-    
-    let secondFrontLegBegin = this.catWidth - 10 - this.imgs.leg.width;
-    this.s.image(this.imgs.leg, 
-          secondFrontLegBegin, 
-          this.imgs.base.height - this.legSink
-    );
-    this.s.image(this.imgs.leg, 
-          secondFrontLegBegin - this.imgs.leg.width - 5,
-          this.imgs.base.height - this.legSink
-    );
+	draw() {
+		this.s.push();
+		this.s.translate(this.body.position.x, this.body.position.y); // make the center of the cat the origin so scaling applies here
+		if (!this.direction) {
+			this.s.scale(-1, 1);
+		}
+		this.s.translate(-this.catWidth / 2, -this.catHeight / 2);
 
-    // Tail
-    this.s.image(
-      this.imgs.tail,
-      -this.imgs.tail.width,
-      this.catHeight / 2 - this.imgs.tail.height / 2 + 3,
-    )
-    
-    pop()
-  }
+		// Base
+		this.s.image(this.imgs.base, 0, 0);
 
-  physics() {
-    if (this.body.position.y > gameHeight + 100) {
-      this.reset();
-    }
-    this.groundCheck();
-    this.ceilingCheck();
+		// Legs
+		this.s.image(this.imgs.leg, 10, this.imgs.base.height - this.legSink);
+		this.s.image(
+			this.imgs.leg,
+			10 + this.imgs.leg.width + 5,
+			this.imgs.base.height - this.legSink
+		);
 
-    // make cat feel easier to control
+		let secondFrontLegBegin = this.catWidth - 10 - this.imgs.leg.width;
+		this.s.image(
+			this.imgs.leg,
+			secondFrontLegBegin,
+			this.imgs.base.height - this.legSink
+		);
+		this.s.image(
+			this.imgs.leg,
+			secondFrontLegBegin - this.imgs.leg.width - 5,
+			this.imgs.base.height - this.legSink
+		);
 
-    // makes jumps less floaty
-    let jumpVelocityFalloff = -2;
-    let fallSubtractor = 0.8;
-    if (this.body.velocity.y > jumpVelocityFalloff || !this.jumping) {
-      Matter.Body.setVelocity(this.body, {
-        x: this.body.velocity.x,
-        y: this.body.velocity.y + fallSubtractor
-      })
-    }
-    // limits fall speed
-    let maxFallSpeed = 20;
-    if (this.body.velocity.y > maxFallSpeed) {
-      Matter.Body.setVelocity(this.body, {
-        x: this.body.velocity.x,
-        y: maxFallSpeed
-      })
-    }
-  }
+		// Tail
+		this.s.image(
+			this.imgs.tail,
+			-this.imgs.tail.width,
+			this.catHeight / 2 - this.imgs.tail.height / 2 + 3
+		);
 
-  // Makes the character jump
-  jump() {
-    let jumpHeight = 1.69;
+		this.s.pop();
+	}
 
-    if (this.isGrounded) 
-    { 
-      Matter.Body.setVelocity(this.body, {
-        x: this.body.velocity.x,
-        y: 0
-      })
-      Matter.Body.applyForce(this.body, this.body.position, {
-        x: this.body.force.x, 
-        y: -jumpHeight
-      });
-    }
-  }
+	physics() {
+		if (this.body.position.y > this.gameHeight + 100) {
+			this.reset();
+		}
+		this.groundCheck();
+		this.ceilingCheck();
 
-  // Ground check, updates this.isGround
-  groundCheck() {
-    let leewayY = {x:0, y:7};
+		// make cat feel easier to control
 
-    let add = Matter.Vector.add;
+		// makes jumps less floaty
+		let jumpVelocityFalloff = -2;
+		let fallSubtractor = 0.8;
+		if (this.body.velocity.y > jumpVelocityFalloff || !this.jumping) {
+			Matter.Body.setVelocity(this.body, {
+				x: this.body.velocity.x,
+				y: this.body.velocity.y + fallSubtractor
+			});
+		}
+		// limits fall speed
+		let maxFallSpeed = 20;
+		if (this.body.velocity.y > maxFallSpeed) {
+			Matter.Body.setVelocity(this.body, {
+				x: this.body.velocity.x,
+				y: maxFallSpeed
+			});
+		}
+	}
 
-    // note: we add lengthRemover so then the bounds is a bit smaller so it doesn't intersect when a vertical rectangle is next to it
-    let lengthRemover = 5;
-    let vertices = [
-      {x: this.body.position.x - this.catWidth/2 + lengthRemover, y: this.body.position.y + this.catHeight/2} // topLeft
-    ];
-    
-    vertices.push(...[
-      add(vertices[0], {x: this.catWidth - lengthRemover * 2, y: 0}), // topRight
-      add(vertices[0], leewayY) // bottomLeft
-    ]);
-    vertices.push(add(vertices[1], leewayY)); // bottomRight
+	// Makes the character jump
+	jump() {
+		let jumpHeight = 1.9;
 
-    
-    let bounds = Matter.Bounds.create(vertices);
-    let query = Matter.Query.region(this.platformBodies, bounds);
-    
-    this.isGrounded = query.length >= 1;
+		if (this.isGrounded) {
+			Matter.Body.setVelocity(this.body, {
+				x: this.body.velocity.x,
+				y: 0
+			});
+			Matter.Body.applyForce(this.body, this.body.position, {
+				x: this.body.force.x,
+				y: -jumpHeight
+			});
+		}
+	}
 
-    if (this.isGrounded) {
-      this.body.friction = this.friction;
-      if (this.jumping) { this.jumping = false }
-    } else { this.body.friction = 0 } // prevent case where body is sticking to vertical wall when holding left/right keys
-    
-    // push();
-    // stroke(this.isGrounded ? 'red' : 'purple');
-    // strokeWeight(10);
-    // for (let vertice of vertices) {
-    //   point(vertice.x, vertice.y);
-    // }
-    // pop();
-  }
+	// Ground check, updates this.isGround
+	groundCheck() {
+		let leewayY = { x: 0, y: 7 };
 
-  // used to check ceiling to prevent leaving crouch early
-  ceilingCheck() {
-    let leewayY = {x:0, y:-10};
+		let add = Matter.Vector.add;
 
-    let add = Matter.Vector.add;
-  
-    let vertices = [
-      {x: this.body.position.x - this.catWidth/2 + 1, y: this.body.position.y - this.catHeight/2} // topLeft
-    ];
-    
-    vertices.push(...[
-      add(vertices[0], {x: this.catWidth - 2, y: 0}), // topRight
-      add(vertices[0], leewayY) // bottomLeft
-    ]);
-    vertices.push(add(vertices[1], leewayY)); // bottomRight
+		// note: we add lengthRemover so then the bounds is a bit smaller so it doesn't intersect when a vertical rectangle is next to it
+		let lengthRemover = 5;
+		let vertices = [
+			{
+				x: this.body.position.x - this.catWidth / 2 + lengthRemover,
+				y: this.body.position.y + this.catHeight / 2
+			} // topLeft
+		];
 
-    
-    let bounds = Matter.Bounds.create(vertices);
-    let query = Matter.Query.region(this.platformBodies, bounds);
-    
-    this.ceilingExists = query.length >= 1;
+		vertices.push(
+			...[
+				add(vertices[0], { x: this.catWidth - lengthRemover * 2, y: 0 }), // topRight
+				add(vertices[0], leewayY) // bottomLeft
+			]
+		);
+		vertices.push(add(vertices[1], leewayY)); // bottomRight
 
-    // push();
-    // stroke(this.ceilingExists ? 'red' : 'purple');
-    // strokeWeight(10);
-    // for (let vertice of vertices) {
-    //   point(vertice.x, vertice.y);
-    // }
-    // pop();
-  }
+		let bounds = Matter.Bounds.create(vertices);
+		let query = Matter.Query.region(this.platformBodies, bounds);
 
-  // Processes input and does the following action
-  processInput() {
-    if (keyIsPressed) {
-      if (keyIsDown(UP_ARROW) || keyIsDown(87)) { // 87 = w
-        this.jumping = true;
-        this.jump();
-      }
+		this.isGrounded = query.length >= 1;
 
-      let velocity = 16;
-      let targetVelocity = this.body.velocity.x;
-      
-      if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) { // 65 = a
-        this.moving = true;
-        this.direction = 0;
-        targetVelocity = -velocity;
-      } else if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) { // 68 = d
-        this.moving = true;
-        this.direction = 1;
-        targetVelocity = velocity;
-      }
+		if (this.isGrounded) {
+			this.body.friction = this.friction;
+			if (this.jumping) {
+				this.jumping = false;
+			}
+		} else {
+			this.body.friction = 0;
+		} // prevent case where body is sticking to vertical wall when holding left/right keys
 
-      targetVelocity = lerp(this.body.velocity.x, targetVelocity, 0.09);
-      Matter.Body.setVelocity(this.body, {x: targetVelocity, y: this.body.velocity.y});
-    } else {
-      this.moving = false;
-      if (this.body.velocity.x != 0) {
-        let speedMultiplier = 0.9;    
-        Matter.Body.setVelocity(this.body, {
-          x: this.body.velocity.x * speedMultiplier,
-          y: this.body.velocity.y
-        })
-      }
-    }
-  }
-  
-  camera() {
-    let x = this.body.position.x;
-    let offset = createVector(0, 0);
-    let cameraOffset = createVector(this.gameWidth / 2 - x - this.catWidth / 2 + offset.x, offset.y);
-    this.s.translate(cameraOffset);
-    this.s.scale(this.camScale);
-  }
+		// push();
+		// stroke(this.isGrounded ? 'red' : 'purple');
+		// strokeWeight(10);
+		// for (let vertice of vertices) {
+		//   point(vertice.x, vertice.y);
+		// }
+		// pop();
+	}
 
-  appendPlatformBody(body) {
-    this.platformBodies.push(body)
-  }
+	// used to check ceiling to prevent leaving crouch early
+	ceilingCheck() {
+		let leewayY = { x: 0, y: -10 };
 
-  deletePlatformBody(body) {
-    let index = this.platformBodies.indexOf(body);
-    this.platformBodies.splice(index, 1);
-  }
-  deletePlatformBodyByIndex(index) {
-    this.platformBodies.splice(index, 1);
-  }
+		let add = Matter.Vector.add;
+
+		let vertices = [
+			{
+				x: this.body.position.x - this.catWidth / 2 + 1,
+				y: this.body.position.y - this.catHeight / 2
+			} // topLeft
+		];
+
+		vertices.push(
+			...[
+				add(vertices[0], { x: this.catWidth - 2, y: 0 }), // topRight
+				add(vertices[0], leewayY) // bottomLeft
+			]
+		);
+		vertices.push(add(vertices[1], leewayY)); // bottomRight
+
+		let bounds = Matter.Bounds.create(vertices);
+		let query = Matter.Query.region(this.platformBodies, bounds);
+
+		this.ceilingExists = query.length >= 1;
+
+		// push();
+		// stroke(this.ceilingExists ? 'red' : 'purple');
+		// strokeWeight(10);
+		// for (let vertice of vertices) {
+		//   point(vertice.x, vertice.y);
+		// }
+		// pop();
+	}
+
+	// Processes input and does the following action
+	processInput() {
+		if (this.s.keyIsPressed) {
+			if (this.s.keyIsDown(this.s.UP_ARROW) || this.s.keyIsDown(87)) {
+				// 87 = w
+				this.jumping = true;
+				this.jump();
+			}
+
+			let velocity = 16;
+			let targetVelocity = this.body.velocity.x;
+
+			if (this.s.keyIsDown(this.s.LEFT_ARROW) || this.s.keyIsDown(65)) {
+				// 65 = a
+				this.moving = true;
+				this.direction = 0;
+				targetVelocity = -velocity;
+			} else if (this.s.keyIsDown(this.s.RIGHT_ARROW) || this.s.keyIsDown(68)) {
+				// 68 = d
+				this.moving = true;
+				this.direction = 1;
+				targetVelocity = velocity;
+			}
+
+			targetVelocity = this.s.lerp(this.body.velocity.x, targetVelocity, 0.09);
+			Matter.Body.setVelocity(this.body, {
+				x: targetVelocity,
+				y: this.body.velocity.y
+			});
+		} else {
+			this.moving = false;
+			if (this.body.velocity.x !== 0) {
+				let speedMultiplier = 0.9;
+				Matter.Body.setVelocity(this.body, {
+					x: this.body.velocity.x * speedMultiplier,
+					y: this.body.velocity.y
+				});
+			}
+		}
+	}
+
+	camera() {
+		let x = this.body.position.x;
+		let offset = this.s.createVector(0, 0);
+		let cameraOffset = this.s.createVector(
+			(1 / 2) * (-x + this.catWidth + offset.x),
+			offset.y
+		);
+		this.s.translate(cameraOffset);
+		this.s.scale(this.camScale);
+	}
+
+	appendPlatformBody(body) {
+		this.platformBodies.push(body);
+	}
+
+	deletePlatformBody(body) {
+		let index = this.platformBodies.indexOf(body);
+		this.platformBodies.splice(index, 1);
+	}
+	deletePlatformBodyByIndex(index) {
+		this.platformBodies.splice(index, 1);
+	}
 }
 
 export default Player;
