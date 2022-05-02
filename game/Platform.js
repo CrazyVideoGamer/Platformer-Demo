@@ -11,6 +11,7 @@ class Platform {
 		this.height = height;
 		this.origHeight = height;
 		this.fillColor = fillColor;
+		this.engine = engine;
 
 		this.body = Matter.Bodies.rectangle(
 			x + width / 2,
@@ -19,7 +20,8 @@ class Platform {
 			height,
 			{ isStatic: true }
 		);
-		Matter.Composite.add(engine.world, this.body);
+		console.log(this.engine);
+		Matter.Composite.add(this.engine.world, this.body);
 	}
 	updateBody(player) {
 		// used for debug rectangles
