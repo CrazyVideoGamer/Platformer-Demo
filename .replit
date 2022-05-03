@@ -1,4 +1,11 @@
+run=""
+language="html"
+
 hidden=[".config"]
+
+[hosting]
+route = "/"
+directory= "/"
 
 [nix]
 channel = "stable-21_11"

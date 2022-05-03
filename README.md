@@ -7,4 +7,4 @@ Extremely epic game cat game
 Give suggestions to solve the problems we have!
 
 # Created by
-ABadGamer73 and CrazyVideoGamez
+ABadGamer73 and CrazyVideoGamer
